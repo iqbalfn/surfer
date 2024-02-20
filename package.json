@@ -1,0 +1,27 @@
+{
+  "name": "surfer",
+  "version": "1.0.0",
+  "description": "Web auto surfer",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iqbalfn/surfer.git"
+  },
+  "keywords": [
+    "nodejs",
+    "pageview",
+    "puppeteer"
+  ],
+  "author": "Iqbal Fauzi <iqbalfawz@gmail.com> (https://iqbalfn.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iqbalfn/surfer/issues"
+  },
+  "homepage": "https://github.com/iqbalfn/surfer#readme",
+  "dependencies": {
+    "puppeteer-core": "^22.1.0"
+  }
+}
