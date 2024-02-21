@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/iqbalfn/surfer#readme",
   "dependencies": {
-    "puppeteer-core": "^22.1.0"
+    "puppeteer-core": "^22.1.0",
+    "tcp-ping": "^0.1.1"
   }
 }
