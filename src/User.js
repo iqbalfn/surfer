@@ -6,7 +6,9 @@ const puppeteer = require('puppeteer-core')
 const Chrome = require('./Chrome.js')
 const Config = require('./Config.js')
 const Device = require('./Device.js')
-const Proxeh = require('./Proxy.js')
+const Logger = require('./Logger.js')
+// const Proxeh = require('./Proxy.js')
+const Surfer = require('./Surfer.js')
 
 class UserConstructor {
     constructor(id) {
@@ -20,16 +22,19 @@ class UserConstructor {
         if (this.datadir)
             opts.userDataDir = this.getDataDir()
 
+        opts.ignoreHTTPSErrors = true
+
         if (!opts.args)
             opts.args = []
         opts.args.push('--no-sandbox')
         opts.args.push('--disabled-setupid-sandbox')
-        opts.args.push('--disable-features=site-per-process')
+        // opts.args.push('--disable-features=site-per-process')
 
         // let proxy = await Proxeh.random()
         // if (proxy)
             // opts.args.push(`--proxy-server=${proxy}`)
 
+        Logger.log(this.id, 'User.Browser.Launch')
         this.browser = await puppeteer.launch(opts)
 
         let pages = await this.browser.pages()
@@ -38,11 +43,7 @@ class UserConstructor {
         if (this.device)
             await this.page.emulate(this.getDevice())
 
-        try {
-            this.page.goto('https://whatismyipaddress.com/')
-        } catch(e) {
-            console.log(this.id + ' Is not work')
-        }
+        // this.page.goto('http://localhost/link/')
     }
 
     // user data
