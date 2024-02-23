@@ -4,8 +4,11 @@ const Device = {
     random() {
         let devices = []
         for (let k in KnownDevices) {
-            if (!k.includes('landscape'))
-                devices.push(k)
+            if (k.includes('landscape'))
+                continue
+            if (k.includes('Kindle'))
+                continue
+            devices.push(k)
         }
 
         devices.sort(e => Math.random() - .5)

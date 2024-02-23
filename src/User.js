@@ -7,7 +7,7 @@ const Chrome = require('./Chrome.js')
 const Config = require('./Config.js')
 const Device = require('./Device.js')
 const Logger = require('./Logger.js')
-// const Proxeh = require('./Proxy.js')
+const Proxeh = require('./Proxy.js')
 const Surfer = require('./Surfer.js')
 
 class UserConstructor {
@@ -26,15 +26,17 @@ class UserConstructor {
 
         if (!opts.args)
             opts.args = []
-        opts.args.push('--no-sandbox')
-        opts.args.push('--disabled-setupid-sandbox')
+        // opts.args.push('--no-sandbox')
+        // opts.args.push('--disabled-setupid-sandbox')
         // opts.args.push('--disable-features=site-per-process')
 
         // let proxy = await Proxeh.random()
-        // if (proxy)
-            // opts.args.push(`--proxy-server=${proxy}`)
+        // if (proxy){
+        //     Logger.log(this.id, 'User.initBrowser.setProxy: ' + proxy)
+        //     opts.args.push(`--proxy-server=${proxy}`)
+        // }
 
-        Logger.log(this.id, 'User.Browser.Launch')
+        Logger.log(this.id, 'User.initBrowser.Launch')
         this.browser = await puppeteer.launch(opts)
 
         let pages = await this.browser.pages()
@@ -42,8 +44,6 @@ class UserConstructor {
         this.page.setDefaultNavigationTimeout(0)
         if (this.device)
             await this.page.emulate(this.getDevice())
-
-        // this.page.goto('http://localhost/link/')
     }
 
     // user data
@@ -93,6 +93,7 @@ class UserConstructor {
     }
 
     setDevice(dev, file) {
+        Logger.log(this.id, 'User.setDevice: ' + dev.name)
         this.device = dev
 
         if (file)

@@ -6,12 +6,12 @@ module.exports = {
     puppeteer: {
         // forwarded puppeteer launch options
         launch: {
-            headless: false
+            headless: true
         }
     },
     user: {
         // all users datadir stored
-        data: '/home/iqbal/Desktop/surfer',
+        data: '/home/iqbal/Http/iq/puppeteer/surfer/data',
 
         // percentage to randomize to create new user
         // on next browser or reuse exists user
@@ -23,19 +23,22 @@ module.exports = {
             max: 300
         },
         pages: [
-            'http://localhost/link/'
+            'https://filmsemi.club/'
         ],
         inpage: {
+            firstPage: {
+                referer: 'https://www.google.com/'
+            },
             reading: {
                 min: 5,
                 max: 60
             },
             next: {
                 // element to tap to go to next page
-                selector: 'a',
+                selector: 'a.thumb',
 
                 // filter the link with this host only
-                host: 'localhost'
+                host: 'filmsemi.club'
             }
         },
         realtime: {
@@ -44,7 +47,9 @@ module.exports = {
             12: 5,
             13: 7,
             14: 2,
-            16: 4
+            16: 4,
+            21: 50,
+            23: 25
         }
     }
 }

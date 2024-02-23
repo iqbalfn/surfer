@@ -12,7 +12,7 @@ const Surfer = {
 
     addUserListener(user) {
         user.browser.on('disconnected', () => {
-            Logger.log(user.id, 'User.Browser.Closed')
+            Logger.log(user.id, 'Surfer.addUserListener.Closed')
             Surfer.users.forEach((e,i) => {
                 if (e.id != user.id)
                     return
@@ -22,14 +22,20 @@ const Surfer = {
         })
     },
 
+    createNewUser() {
+        let uid = UUID.v4()
+        Logger.log(uid, 'Surfer.createNewUser')
+        return uid
+    },
+
     getNextUser() {
         if (!Config.user.data)
-            return UUID.v4()
+            return Surfer.createNewUser()
 
         let chance = Config.user.createChance
         let percent = Math.random() * 100
         if (percent < chance) {
-            return UUID.v4()
+            return Surfer.createNewUser()
         }
 
         let users = fs.readdirSync(Config.user.data)
@@ -42,30 +48,34 @@ const Surfer = {
         })
 
         if (!users.length)
-            return UUID.v4()
+            return Surfer.createNewUser()
 
         let index = Math.floor(Math.random() * users.length)
-        return users[index]
+        let uid = users[index]
+        Logger.log(uid, 'Surfer.getNextUser: ' + uid)
+        return uid
     },
 
     async navigate() {
-        setTimeout(Surfer.navigate, 3000)
-
         // expected realtime
         let now = (new Date()).getHours()
         let realtime = Config.navigator.realtime[now] ?? 1
 
         if (Surfer.users.length >= realtime)
-            return
+            return setTimeout(Surfer.navigate, 5000)
+
+        Logger.log('MAIN', 'Surfer.navigate.Realtime: ' + Surfer.users.length + '/' + realtime)
 
         let userId = Surfer.getNextUser()
         let user = await User.get(userId)
         Surfer.addUserListener(user)
         Surfer.users.push(user)
         Navigator.navigate(user)
+
+        setTimeout(Surfer.navigate, 5000)
     },
 
-    init() {
+    async init() {
         Surfer.navigate()
     }
 }

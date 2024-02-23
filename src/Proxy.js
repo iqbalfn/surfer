@@ -24,7 +24,7 @@ const Proxy = {
     },
 
     async getAllProxies() {
-        let url = 'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=id&ssl=yes&anonymity=all'
+        let url = 'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=yes&anonymity=all'
 
         return new Promise(res => {
             let req = https.request(url, resp => {

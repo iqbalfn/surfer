@@ -6,9 +6,9 @@ const Navigator = {
         let cnf = Config.navigator.session
         let time = Math.round(Math.random() * (cnf.max - cnf.min) + cnf.min)
         // time = 14
-        Logger.log(user.id, 'User.Browser.Timeout: ' + time + 's')
+        Logger.log(user.id, 'Navigator.closeSessionTimer: ' + time + 's')
         setTimeout(u => {
-            Logger.log(u.id, 'User.Browser.ExitRequest')
+            Logger.log(u.id, 'Navigator.closeSessionTimer.ExitSignal')
             u.requestClose = true
         }, time * 1000, user)
     },
@@ -17,8 +17,15 @@ const Navigator = {
         let pages = Config.navigator.pages
         let page = pages[Math.floor(Math.random()*pages.length)]
 
-        Logger.log(user.id, 'User.Browser.Goto: ' + page)
-        user.page.goto(page)
+        Logger.log(user.id, 'Navigator.firstPage: ' + page)
+
+        let opts = Config.navigator.inpage.firstPage
+        try {
+            user.page.goto(page, opts)
+        } catch(e) {
+            Logger.log(user.id, 'Navigator.firstPage.Error: ' + e.message)
+            user.browser.requestClose = true
+        }
         Navigator.nextPage(user)
     },
 
@@ -34,7 +41,7 @@ const Navigator = {
         let elements = await user.page.$$(selector)
 
         if (!elements.length){
-            Logger.log(user.id, 'User.Browser.Page.Selector: No node found')
+            Logger.log(user.id, 'Navigator.nextPageHandler: No node found')
             return Navigator.nextPage(user)
         }
 
@@ -43,17 +50,19 @@ const Navigator = {
         if (host) {
             let ehost = await user.page.evaluate(el => el.hostname, element)
             if (ehost != host){
-                Logger.log(user.id, 'User.Browser.Page.Selector: Host not match')
+                Logger.log(user.id, 'Navigator.nextPageHandler: Host not match')
                 return Navigator.nextPage(user)
             }
         }
 
         let visible = await element.isVisible()
         if (!visible){
-            Logger.log(user.id, 'User.Browser.Page.Selector: Element not visible')
+            Logger.log(user.id, 'Navigator.nextPageHandler: Element not visible')
             return Navigator.nextPage(user)
         }
 
+        let link = await user.page.evaluate(el => el.href, element)
+        Logger.log(user.id, 'Navigator.nextPageHandler.Click: ' + link)
         element.tap()
         Navigator.nextPage(user)
     },
@@ -66,14 +75,14 @@ const Navigator = {
         let selector = cnf.next.selector
         let timer = cnf.reading
         let time = Math.round(Math.random() * (timer.max - timer.min) + timer.min)
-        time = 3
+        // time = 3
 
-        Logger.log(user.id, 'User.Browser.Reading: ' + time + 's')
+        Logger.log(user.id, 'Navigator.nextPage.Timeout: ' + time + 's')
 
         try {
             await user.page.waitForSelector(selector)
         } catch(e) {
-            Logger.log(user.id, 'User.Browser.Page.Selector: Selector timeout')
+            Logger.log(user.id, 'Navigator.nextPage: Selector timeout')
         }
 
         setTimeout(Navigator.nextPageHandler, time * 1000, user)
