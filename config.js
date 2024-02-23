@@ -31,7 +31,11 @@ module.exports = {
                 max: 60
             },
             next: {
-                selector: 'a'
+                // element to tap to go to next page
+                selector: 'a',
+
+                // filter the link with this host only
+                host: 'localhost'
             }
         },
         realtime: {

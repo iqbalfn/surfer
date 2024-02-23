@@ -5,7 +5,7 @@ const Navigator = {
     closeSessionTimer(user) {
         let cnf = Config.navigator.session
         let time = Math.round(Math.random() * (cnf.max - cnf.min) + cnf.min)
-        time = 14
+        // time = 14
         Logger.log(user.id, 'User.Browser.Timeout: ' + time + 's')
         setTimeout(u => {
             Logger.log(u.id, 'User.Browser.ExitRequest')
@@ -22,6 +22,42 @@ const Navigator = {
         Navigator.nextPage(user)
     },
 
+    async nextPageHandler(user) {
+        let cnf = Config.navigator.inpage
+
+        if (user.requestClose)
+            return user.browser.close()
+
+        let clickables = []
+        let selector = cnf.next.selector
+        let host = cnf.next.host
+        let elements = await user.page.$$(selector)
+
+        if (!elements.length){
+            Logger.log(user.id, 'User.Browser.Page.Selector: No node found')
+            return Navigator.nextPage(user)
+        }
+
+        let element = elements[Math.floor(Math.random()*elements.length)]
+
+        if (host) {
+            let ehost = await user.page.evaluate(el => el.hostname, element)
+            if (ehost != host){
+                Logger.log(user.id, 'User.Browser.Page.Selector: Host not match')
+                return Navigator.nextPage(user)
+            }
+        }
+
+        let visible = await element.isVisible()
+        if (!visible){
+            Logger.log(user.id, 'User.Browser.Page.Selector: Element not visible')
+            return Navigator.nextPage(user)
+        }
+
+        element.tap()
+        Navigator.nextPage(user)
+    },
+
     async nextPage(user) {
         if (user.requestClose)
             return user.browser.close()
@@ -34,19 +70,13 @@ const Navigator = {
 
         Logger.log(user.id, 'User.Browser.Reading: ' + time + 's')
 
-        await user.page.waitForSelector(selector)
+        try {
+            await user.page.waitForSelector(selector)
+        } catch(e) {
+            Logger.log(user.id, 'User.Browser.Page.Selector: Selector timeout')
+        }
 
-        setTimeout(async (u) => {
-            if (u.requestClose)
-                return u.browser.close()
-
-            let els = await u.page.$$(selector)
-            let el = els[Math.floor(Math.random()*els.length)]
-
-            Logger.log(user.id, 'User.Browser.Click')
-            el.click()
-            Navigator.nextPage(u)
-        }, time * 1000, user)
+        setTimeout(Navigator.nextPageHandler, time * 1000, user)
     },
 
     navigate(user) {
